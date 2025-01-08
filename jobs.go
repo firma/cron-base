@@ -35,6 +35,7 @@ func (n StartJob) Remove(entryId cron.EntryID) error {
 func (n StartJob) Start() error {
 
 	for _, v := range n.jobs {
+
 		entryId, err := n.cron.AddJob(v.Spec(), warpJob(fmt.Sprintf("%s: %s", v.Name(), v.Spec()), v.Handler()))
 		if err != nil {
 			log.Errorw(v.Name(), "spec", v.Spec(), "err", err, "entiryId", entryId)
@@ -53,17 +54,18 @@ func (n StartJob) Stop() context.Context {
 
 func warpJob(name string, fn JobHandler) cron.Job {
 	ctx := context.TODO()
-	return cron.NewChain(cron.SkipIfStillRunning(newLogger(ctx))).Then(
+	loggerRecover := newLogger(ctx)
+	return cron.NewChain(cron.SkipIfStillRunning(newLogger(ctx)), cron.Recover(loggerRecover)).Then(
 		cron.FuncJob(
 			func() {
 				//ctx, span := tracing.StartConsume(context.Background(), name)
 				//span.End()
-				defer func() {
-					if p := recover(); p != nil {
-						stack := Stack(3)
-						log.Errorf("脚本执行异常: %s %s", p, stack)
-					}
-				}()
+				//defer func() {
+				//	if p := recover(); p != nil {
+				//		stack := Stack(3)
+				//		log.Errorf("脚本执行异常: %s %s", p, stack)
+				//	}
+				//}()
 
 				begin := time.Now()
 				log.Infof("开始执行脚本: %s", name)

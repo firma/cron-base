@@ -17,16 +17,16 @@ func newLogger(ctx context.Context) cron.Logger {
 }
 
 func (l logger) Info(msg string, keysAndValues ...any) {
-	log.Infof(loggerTag+msg, keysAndValues...)
+	log.Context(l.ctx).Infof(loggerTag+msg, keysAndValues...)
 }
 func (l logger) Infof(msg string, keysAndValues ...any) {
-	log.Infof(loggerTag+msg, keysAndValues...)
+	log.Context(l.ctx).Infof(loggerTag+msg, keysAndValues...)
 }
 
 func (l logger) Error(err error, msg string, keysAndValues ...any) {
-	log.Errorf(loggerTag+msg+err.Error(), keysAndValues...)
+	log.Context(l.ctx).Errorf(loggerTag+msg+err.Error(), keysAndValues...)
 }
 
 func (l logger) Errorf(err error, msg string, keysAndValues ...any) {
-	log.Errorf(loggerTag+msg+err.Error(), keysAndValues...)
+	log.Context(l.ctx).Errorf(loggerTag+msg+err.Error(), keysAndValues...)
 }
